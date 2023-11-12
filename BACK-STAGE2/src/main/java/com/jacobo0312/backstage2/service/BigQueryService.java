@@ -4,13 +4,12 @@ package com.jacobo0312.backstage2.service;
 import com.google.cloud.bigquery.*;
 import com.jacobo0312.backstage2.dto.DataFilterDTO;
 import com.jacobo0312.backstage2.dto.GoogleTrendsResponseDTO;
-import com.jacobo0312.backstage2.model.Term;
-import com.jacobo0312.backstage2.model.TermInternational;
+import com.jacobo0312.backstage2.enums.TableName;
+import com.jacobo0312.backstage2.model.*;
 import com.jacobo0312.backstage2.util.FormatDate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
@@ -20,13 +19,74 @@ public class BigQueryService {
 
     private BigQuery bigQuery;
 
-    public GoogleTrendsResponseDTO executeQuery(int limit, DataFilterDTO filterDTO) throws InterruptedException {
-        log.info("Execute query");
+    private static final String INTERNATIONAL_TOP_TERMS_TABLE = "bigquery-public-data.google_trends.international_top_terms";
+    private static final String INTERNATIONAL_TOP_RISING_TERMS_TABLE = "bigquery-public-data.google_trends.international_top_rising_terms";
+    private static final String TOP_TERMS_TABLE = "bigquery-public-data.google_trends.top_terms";
+    private static final String TOP_RISING_TERMS_TABLE = "bigquery-public-data.google_trends.top_rising_terms";
 
+
+    public GoogleTrendsResponseDTO filterGoogleTrendsData(int limit, DataFilterDTO filterDTO) {
+
+        // Build the query
+        StringBuilder query = new StringBuilder("SELECT * FROM `table` WHERE 1=1");
+
+
+        if (filterDTO.getCountries() != null && !filterDTO.getCountries().isEmpty()) {
+            query.append(" AND country_name IN (");
+            for (String country : filterDTO.getCountries()) {
+                query.append("'").append(country).append("',");
+            }
+            // Delete the last comma
+            query.deleteCharAt(query.length() - 1);
+            query.append(")");
+        }
+
+        // Add the order by score
+        query.append(" ORDER BY rank ASC");
+
+        //Add the limit
+        query.append(" LIMIT ").append(limit);
+
+        GoogleTrendsResponseDTO responseDTO = new GoogleTrendsResponseDTO();
+
+
+        for (TableName tableName : TableName.values()) {
+            //Replace table in query
+            query.replace(14, query.indexOf(" WHERE"), getTableName(tableName));
+            TableResult result;
+            try {
+
+                result = executeQuery(query.toString());
+
+            } catch (BigQueryException | InterruptedException e) {
+                log.error("Error executing query");
+                result = null;
+            }
+
+            if (result == null) continue;
+
+            List<? extends Term> terms = getTermsFromTable(result, tableName);
+
+            switch (tableName) {
+                case INTERNATIONAL_TOP_TERMS -> responseDTO.setTermInternationalList((List<TermInternational>) terms);
+                case INTERNATIONAL_TOP_RISING_TERMS ->
+                        responseDTO.setTermRisingInternationalList((List<TermRisingInternational>) terms);
+                case TOP_TERMS -> responseDTO.setTermUSAList((List<TermUSA>) terms);
+                case TOP_RISING_TERMS -> responseDTO.setTermRisingUSAList((List<TermRisingUSA>) terms);
+            }
+
+
+        }
+
+        return responseDTO;
+    }
+
+    private TableResult executeQuery(String query) throws InterruptedException {
+        log.info("Execute query");
+        log.info("Query: " + query);
 
         QueryJobConfiguration queryConfig =
-                QueryJobConfiguration.newBuilder(
-                                "SELECT * FROM `bigquery-public-data.google_trends.international_top_terms`  LIMIT 10")
+                QueryJobConfiguration.newBuilder(query)
                         .setUseLegacySql(false)
                         .build();
 
@@ -42,50 +102,66 @@ public class BigQueryService {
         log.info("service gctj queryJob: " + queryJob);
 
         // Wait for the query to complete.
+        queryJob = queryJob.waitFor();
 
-        try {
-            queryJob = queryJob.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        return queryJob.getQueryResults();
+    }
 
-        // Check for errors
-        if (queryJob == null) {
-            throw new RuntimeException("Job no longer exists");
-        } else if (queryJob.getStatus().getError() != null) {
-            // You can also look at queryJob.getStatus().getExecutionErrors() for all
-            // errors, not just the latest one.
-            log.error(queryJob.getStatus().toString());
-            throw new RuntimeException(queryJob.getStatus().getError().toString());
-        }
 
-        // Get the results.
-
-        TableResult result = queryJob.getQueryResults();
-
-        // Crear una lista para almacenar los objetos TuModelo
+    private List<? extends Term> getTermsFromTable(TableResult result, TableName tableName) {
+        // Create a list
         List<Term> terms = new ArrayList<>();
 
-        // Iterar sobre los resultados y mapearlos a TuModelo
+        // Iterate through the results
         for (FieldValueList row : result.iterateAll()) {
+            Term termData = switch (tableName) {
+                case INTERNATIONAL_TOP_TERMS -> new TermInternational();
+                case INTERNATIONAL_TOP_RISING_TERMS -> new TermRisingInternational();
+                case TOP_TERMS -> new TermUSA();
+                case TOP_RISING_TERMS -> new TermRisingUSA();
+            };
 
-            TermInternational termData = new TermInternational();
-
-            // Setear todos los atributos antes de pasarlos al constructor
+            // Set the values
             termData.setTerm(row.get("term").isNull() ? null : row.get("term").getStringValue());
             termData.setRank(row.get("rank").isNull() ? null : row.get("rank").getNumericValue().intValue());
             termData.setScore(row.get("score").isNull() ? null : row.get("score").getNumericValue().intValue());
             termData.setRefreshDate(row.get("refresh_date").isNull() ? null : FormatDate.parseDateString(row.get("refresh_date").getStringValue()));
             termData.setWeek(row.get("week").isNull() ? null : FormatDate.parseDateString(row.get("week").getStringValue()));
-            termData.setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
-            termData.setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
-            termData.setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
 
-            // Ahora pasa los atributos al constructor
+            if (termData instanceof TermInternational) {
+                ((TermInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
+                ((TermInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+            }
+
+            if (termData instanceof TermRisingInternational) {
+                ((TermRisingInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
+                ((TermRisingInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+                ((TermRisingInternational) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
+            }
+
+            if (termData instanceof TermUSA) {
+                ((TermUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
+                ((TermUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
+            }
+
+            if (termData instanceof TermRisingUSA) {
+                ((TermRisingUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
+                ((TermRisingUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
+                ((TermRisingUSA) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
+            }
+
             terms.add(termData);
         }
-        return new GoogleTrendsResponseDTO();
+        return terms;
     }
 
+    private String getTableName(TableName tableName) {
+        return switch (tableName) {
+            case INTERNATIONAL_TOP_TERMS -> INTERNATIONAL_TOP_TERMS_TABLE;
+            case INTERNATIONAL_TOP_RISING_TERMS -> INTERNATIONAL_TOP_RISING_TERMS_TABLE;
+            case TOP_TERMS -> TOP_TERMS_TABLE;
+            case TOP_RISING_TERMS -> TOP_RISING_TERMS_TABLE;
+        };
+    }
 
 }

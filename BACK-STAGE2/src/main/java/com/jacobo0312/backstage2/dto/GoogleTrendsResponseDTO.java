@@ -10,8 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.PositiveOrZero;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,19 +21,20 @@ import java.util.List;
 public class GoogleTrendsResponseDTO {
 
     @ApiModelProperty(notes = "List of international terms")
-    private List<TermInternational> termInternationalList;
+    @Builder.Default
+    private List<TermInternational> termInternationalList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of rising international terms")
-    private List<TermRisingInternational> termRisingInternationalList;
+    @Builder.Default
+    private List<TermRisingInternational> termRisingInternationalList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of USA terms")
-    private List<TermUSA> termUSAList;
+    @Builder.Default
+    private List<TermUSA> termUSAList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of rising USA terms")
-    private List<TermRisingUSA> termRisingUSAList;
+    @Builder.Default
+    private List<TermRisingUSA> termRisingUSAList = new ArrayList<>();
 
-    @ApiModelProperty(notes = "Limit for the number of results")
-    @PositiveOrZero(message = "Limit should be a positive or zero value")
-    private Integer limit;
 
 }

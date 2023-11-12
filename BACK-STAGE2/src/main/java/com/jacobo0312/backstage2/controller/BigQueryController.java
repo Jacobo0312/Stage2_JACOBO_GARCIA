@@ -24,11 +24,10 @@ public class BigQueryController {
     @PostMapping("/google-trends")
     @ApiOperation(value = "Filter Google Trends Data", notes = "Filter Google Trends data based on provided criteria.")
     public ResponseEntity<GoogleTrendsResponseDTO> filterData(
-            @ApiParam(value = "Limit for the number of results", defaultValue = "10")
-            @RequestParam(required = false, defaultValue = "10") int limit,
+            @ApiParam(value = "Limit for the number of results", defaultValue = "10") @RequestParam(required = false, defaultValue = "10") int limit,
             @RequestBody DataFilterDTO filterDTO) {
         try {
-            GoogleTrendsResponseDTO responseDTO = bigQueryService.executeQuery(limit, filterDTO);
+            GoogleTrendsResponseDTO responseDTO = bigQueryService.filterGoogleTrendsData(limit, filterDTO);
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error processing Google Trends request", e);

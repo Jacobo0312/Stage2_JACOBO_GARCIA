@@ -38,19 +38,15 @@ The dataset has 4 tables:
 
 - **Term - STRING:** The human-readable identifier for a term, e.g., "Acme Inc".
 
-- **DMA Name - STRING:** Stores the full text name of the Designated Market Area (DMA).
+- **WEEK - DATE:** The first day of the week for the current row's position in the time series for the combination of term.
 
-- **DMA Id - INT:** 3-digit numerical ID used to identify a Designated Market Area (DMA).
-
-- **WEEK - DATE:** The first day of the week for the current row's position in the time series for the combination of term, DMA, and score.
-
-- **Refresh Date - DATE:** Date when the new set of term, score, and DMA combination was added. Note: This column also serves as the partition key.
+- **Refresh Date - DATE:** Date when the new set of term and score combination was added.
 
 - **Percent Gain - INT:** Percentage gain (rate) at which the term rose compared to the previous date period.
 
-- **Score - INT:** Index from 0-100 that denotes how popular this term was for a DMA during the current date, relative to the other dates in the same time series for this term (260 weeks = 52 weeks * 5 years).
+- **Score - INT:** 0-100 index denoting how popular this term was during the current date, relative to the other dates in the same time series for this term (260 weeks = 52 weeks * 5 years).
 
-- **Rank - INT:** Numeric representation of where the term falls in comparison to the other top terms for the day across the US market (e.g., rank of 1-25). Note: The rank value remains consistent across all historical data and DMA.
+- **Rank - INT:** Numeric representation of where the term falls in comparison to the other top terms for the day. (e.g., rank of 1-25).
 
 - **Country Name - STRING:** The name of the country.
 
@@ -58,11 +54,10 @@ The dataset has 4 tables:
 
 - **Region Name - STRING:** The name of the region within the chosen country.
 
+- **DMA Name - STRING:** Stores the full text name of the Designated Market Area (DMA).
+
+- **DMA Id - INT:** 3-digit numerical ID used to identify a Designated Market Area (DMA).
 
 > **_NOTE:_**  DMA stands for "Designated Market Area." It's a term commonly used in the United States to define specific geographic regions that television and media markets cover.
 
-
-
-
-[link] https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=google_trends&page=dataset&project=stage2-404603&ws=!1m5!1m4!4m3!1sbigquery-public-data!2sgoogle_trends!3stop_rising_terms
 
