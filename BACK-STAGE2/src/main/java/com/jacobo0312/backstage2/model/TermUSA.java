@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class TermUSA extends Term {
 
     private String dmaName;
+
     private Integer dmaId;
 
 }

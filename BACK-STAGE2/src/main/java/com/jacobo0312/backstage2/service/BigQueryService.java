@@ -2,6 +2,8 @@ package com.jacobo0312.backstage2.service;
 
 
 import com.google.cloud.bigquery.*;
+import com.jacobo0312.backstage2.dto.DataFilterDTO;
+import com.jacobo0312.backstage2.dto.GoogleTrendsResponseDTO;
 import com.jacobo0312.backstage2.model.Term;
 import com.jacobo0312.backstage2.model.TermInternational;
 import com.jacobo0312.backstage2.util.FormatDate;
@@ -18,8 +20,8 @@ public class BigQueryService {
 
     private BigQuery bigQuery;
 
-    public List<Term> basicQuery() throws InterruptedException {
-        log.info("basicQuery Started");
+    public GoogleTrendsResponseDTO executeQuery(int limit, DataFilterDTO filterDTO) throws InterruptedException {
+        log.info("Execute query");
 
 
         QueryJobConfiguration queryConfig =
@@ -47,20 +49,17 @@ public class BigQueryService {
             e.printStackTrace();
         }
 
-        log.info("service gctj queryJob: " + queryJob);
-
         // Check for errors
         if (queryJob == null) {
             throw new RuntimeException("Job no longer exists");
         } else if (queryJob.getStatus().getError() != null) {
             // You can also look at queryJob.getStatus().getExecutionErrors() for all
             // errors, not just the latest one.
+            log.error(queryJob.getStatus().toString());
             throw new RuntimeException(queryJob.getStatus().getError().toString());
         }
 
         // Get the results.
-
-        QueryResponse response = bigQuery.getQueryResults(jobId);
 
         TableResult result = queryJob.getQueryResults();
 
@@ -85,7 +84,7 @@ public class BigQueryService {
             // Ahora pasa los atributos al constructor
             terms.add(termData);
         }
-        return terms;
+        return new GoogleTrendsResponseDTO();
     }
 
 
