@@ -33,6 +33,7 @@ The dataset has 4 tables:
 
 ## Data model:
 
+![Data Model Google Trends](docs/DATA_MODEL_GOOGLE_TRENDS.png)
 
 ### Attributes:
 

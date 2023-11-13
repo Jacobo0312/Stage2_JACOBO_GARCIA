@@ -30,7 +30,7 @@ public class BigQueryService {
         // Build the query
         StringBuilder query = new StringBuilder("SELECT * FROM `table` WHERE 1=1");
 
-
+        //Filter by countries
         if (filterDTO.getCountries() != null && !filterDTO.getCountries().isEmpty()) {
             query.append(" AND country_name IN (");
             for (String country : filterDTO.getCountries()) {
@@ -39,6 +39,16 @@ public class BigQueryService {
             // Delete the last comma
             query.deleteCharAt(query.length() - 1);
             query.append(")");
+        }
+
+        //Filter by time range
+        // Add date range filter
+        if (filterDTO.getStartDate() != null && filterDTO.getEndDate() != null) {
+            query.append(" AND refresh_date BETWEEN '")
+                    .append(filterDTO.getStartDate())
+                    .append("' AND '")
+                    .append(filterDTO.getEndDate())
+                    .append("'");
         }
 
         // Add the order by score

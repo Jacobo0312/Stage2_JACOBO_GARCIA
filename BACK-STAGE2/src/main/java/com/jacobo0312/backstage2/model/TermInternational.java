@@ -16,5 +16,6 @@ public class TermInternational extends Term {
     private String countryName;
     private String countryCode;
     private String regionName;
+    private String regionCode;
 
 }
