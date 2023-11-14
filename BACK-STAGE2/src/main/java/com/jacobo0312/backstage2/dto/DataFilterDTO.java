@@ -11,6 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 public class DataFilterDTO {
 
+    @ApiModelProperty(notes = "Term to search")
+    @Size(max = 2, message = "Term should not exceed 255 characters")
+    private String term;
+
     private List<@Size(max = 255, message = "Country should not exceed 255 characters") String> countries;
 
     @ApiModelProperty(notes = "Start date for the time range filter (format: yyyy-MM-dd)")

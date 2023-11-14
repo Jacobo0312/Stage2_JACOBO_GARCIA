@@ -51,6 +51,11 @@ public class BigQueryService {
                     .append("'");
         }
 
+        if (filterDTO.getTerm() != null && !filterDTO.getTerm().isEmpty()) {
+            query.append(" AND term LIKE '%' || '").append(filterDTO.getTerm()).append("' || '%'");
+        }
+
+
         // Add the order by score
         query.append(" ORDER BY rank ASC");
 
@@ -69,7 +74,7 @@ public class BigQueryService {
                 result = executeQuery(query.toString());
 
             } catch (BigQueryException | InterruptedException e) {
-                log.error("Error executing query");
+                log.error("Error executing query: " + e.getMessage());
                 result = null;
             }
 
@@ -92,8 +97,7 @@ public class BigQueryService {
     }
 
     private TableResult executeQuery(String query) throws InterruptedException {
-        log.info("Execute query");
-        log.info("Query: " + query);
+        log.info("Execute Query: " + query);
 
         QueryJobConfiguration queryConfig =
                 QueryJobConfiguration.newBuilder(query)
@@ -108,8 +112,6 @@ public class BigQueryService {
         JobId jobId = JobId.of(jobIdStr);
 
         Job queryJob = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
-
-        log.info("service gctj queryJob: " + queryJob);
 
         // Wait for the query to complete.
         queryJob = queryJob.waitFor();
@@ -141,11 +143,15 @@ public class BigQueryService {
             if (termData instanceof TermInternational) {
                 ((TermInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
                 ((TermInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+                ((TermInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
+                ((TermInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
             }
 
             if (termData instanceof TermRisingInternational) {
                 ((TermRisingInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
                 ((TermRisingInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+                ((TermRisingInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
+                ((TermRisingInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
                 ((TermRisingInternational) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
             }
 
