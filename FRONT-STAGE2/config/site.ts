@@ -5,16 +5,16 @@ export const siteConfig = {
   description: 'Build queries for Google Trends effortlessly and efficiently.',
   navItems: [
     {
-      label: 'Home',
-      href: '/',
+      label: 'Dashboard',
+      href: '/home/dashboard',
     },
     {
-      label: 'Build',
-      href: '/build',
+      label: 'Create',
+      href: '/home/create',
     },
     {
       label: 'Queries',
-      href: '/queries',
+      href: '/home/queries',
     },
   ],
   links: {},

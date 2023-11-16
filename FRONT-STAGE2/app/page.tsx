@@ -15,6 +15,13 @@ export default function Home() {
   //Router
   const router = useRouter();
 
+  React.useEffect(() => {
+    const username = localStorage.getItem('username');
+    if (username) {
+      router.push('/home/dashboard');
+    }
+  }, [router]);
+
   const handleStartApplication = async () => {
     //Reset errors
     setError('');
@@ -25,9 +32,11 @@ export default function Home() {
       setError('Username is required');
       return;
     }
+
+    localStorage.setItem('username', username);
     setLoading(true);
     //Redirect to application
-    router.push('/home');
+    router.push('/home/dashboard');
   };
 
   if (loading) return <Loader />;

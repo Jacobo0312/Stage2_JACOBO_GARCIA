@@ -1,9 +1,7 @@
 'use client';
 
 import {
-  Button,
   Kbd,
-  Link,
   Input,
   Navbar as NextUINavbar,
   NavbarContent,
@@ -14,6 +12,13 @@ import {
   NavbarMenuItem,
   Tabs,
   Tab,
+} from '@nextui-org/react';
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
 } from '@nextui-org/react';
 
 import { link as linkStyles } from '@nextui-org/theme';
@@ -30,9 +35,33 @@ import {
   SearchIcon,
 } from '@/components/icons';
 
-import { Logo } from '@/components/icons';
+import { useRouter } from 'next/navigation';
+import React from 'react';
+import Loader from './loader';
 
 export const Navbar = () => {
+  //Router
+  const router = useRouter();
+  const [username, setUsername] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoading(true);
+    const username = localStorage.getItem('username');
+    if (!username) {
+      router.push('/');
+    } else {
+      setUsername(username);
+      setLoading(false);
+    }
+  }, [router]);
+
+  const logOut = () => {
+    setLoading(true);
+    localStorage.removeItem('username');
+    router.push('/');
+  };
+
   //   const searchInput = (
   //     <Input
   //       aria-label="Search"
@@ -142,6 +171,8 @@ export const Navbar = () => {
   // 	</NextUINavbar>
   // );
 
+  if (loading) return <Loader />;
+
   return (
     <NextUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="center">
@@ -151,18 +182,29 @@ export const Navbar = () => {
               key={item.href}
               title={
                 <div className="flex items-center space-x-2 w-20 justify-center">
-                  <span>{item.label}</span>
+                  <NextLink href={item.href}> {item.label} </NextLink>
                 </div>
               }
             />
           ))}
-          {/* User */}
           <Tab
             key="user"
             title={
-              <div className="flex items-center space-x-2 w-20 justify-center">
-                <span>User</span>
-              </div>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button variant="light">{username}</Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Static Actions">
+                  <DropdownItem
+                    key="logOut"
+                    className="text-danger text-center"
+                    color="danger"
+                    onClick={logOut}
+                  >
+                    Log out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             }
           />
         </Tabs>
