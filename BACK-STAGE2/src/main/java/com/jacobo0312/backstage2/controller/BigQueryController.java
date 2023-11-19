@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/google-trends")
 @Slf4j
 @AllArgsConstructor
 @Api(tags = "Google Trends API")
@@ -21,13 +21,25 @@ public class BigQueryController {
 
     private final BigQueryService bigQueryService;
 
-    @PostMapping("/google-trends")
+    @PostMapping("/create")
     @ApiOperation(value = "Filter Google Trends Data", notes = "Filter Google Trends data based on provided criteria.")
     public ResponseEntity<GoogleTrendsResponseDTO> filterData(
             @ApiParam(value = "Limit for the number of results", defaultValue = "10") @RequestParam(required = false, defaultValue = "10") int limit,
             @RequestBody DataFilterDTO filterDTO) {
         try {
             GoogleTrendsResponseDTO responseDTO = bigQueryService.filterGoogleTrendsData(limit, filterDTO);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error processing Google Trends request", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/top_term_usa")
+    @ApiOperation(value = "Get top term usa", notes = "Get top term usa")
+    public ResponseEntity<GoogleTrendsResponseDTO> getTopTermUSA() {
+        try {
+            GoogleTrendsResponseDTO responseDTO = bigQueryService.getTopTermUSA();
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error processing Google Trends request", e);

@@ -6,10 +6,10 @@ import com.jacobo0312.backstage2.dto.DataFilterDTO;
 import com.jacobo0312.backstage2.dto.GoogleTrendsResponseDTO;
 import com.jacobo0312.backstage2.enums.TableName;
 import com.jacobo0312.backstage2.model.*;
-import com.jacobo0312.backstage2.util.FormatDate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 @Service
@@ -28,7 +28,12 @@ public class BigQueryService {
     public GoogleTrendsResponseDTO filterGoogleTrendsData(int limit, DataFilterDTO filterDTO) {
 
         // Build the query
-        StringBuilder query = new StringBuilder("SELECT * FROM `table` WHERE 1=1");
+        //SELECT
+        //  term,
+        //  rank,
+        //  AVG(score) AS score
+        //FROM
+        StringBuilder query = new StringBuilder("SELECT term, rank, AVG(score)AS score FROM `table` WHERE 1=1");
 
         //Filter by countries
         if (filterDTO.getCountries() != null && !filterDTO.getCountries().isEmpty()) {
@@ -44,7 +49,7 @@ public class BigQueryService {
         //Filter by time range
         // Add date range filter
         if (filterDTO.getStartDate() != null && filterDTO.getEndDate() != null) {
-            query.append(" AND refresh_date BETWEEN '")
+            query.append(" AND week BETWEEN '")
                     .append(filterDTO.getStartDate())
                     .append("' AND '")
                     .append(filterDTO.getEndDate())
@@ -57,7 +62,10 @@ public class BigQueryService {
 
 
         // Add the order by score
-        query.append(" ORDER BY rank ASC");
+        query.append("GROUP BY\n" +
+                "  term, rank\n" +
+                "ORDER BY\n" +
+                "  rank ASC,score DESC");
 
         //Add the limit
         query.append(" LIMIT ").append(limit);
@@ -67,7 +75,7 @@ public class BigQueryService {
 
         for (TableName tableName : TableName.values()) {
             //Replace table in query
-            query.replace(14, query.indexOf(" WHERE"), getTableName(tableName));
+            query.replace(43, query.indexOf(" WHERE"), getTableName(tableName));
             TableResult result;
             try {
 
@@ -137,33 +145,33 @@ public class BigQueryService {
             termData.setTerm(row.get("term").isNull() ? null : row.get("term").getStringValue());
             termData.setRank(row.get("rank").isNull() ? null : row.get("rank").getNumericValue().intValue());
             termData.setScore(row.get("score").isNull() ? null : row.get("score").getNumericValue().intValue());
-            termData.setRefreshDate(row.get("refresh_date").isNull() ? null : FormatDate.parseDateString(row.get("refresh_date").getStringValue()));
-            termData.setWeek(row.get("week").isNull() ? null : FormatDate.parseDateString(row.get("week").getStringValue()));
+//            termData.setRefreshDate(row.get("refresh_date").isNull() ? null : FormatDate.parseDateString(row.get("refresh_date").getStringValue()));
+//            termData.setWeek(row.get("week").isNull() ? null : FormatDate.parseDateString(row.get("week").getStringValue()));
 
             if (termData instanceof TermInternational) {
-                ((TermInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
-                ((TermInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
-                ((TermInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
-                ((TermInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
+//                ((TermInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
+//                ((TermInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+//                ((TermInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
+//                ((TermInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
             }
 
             if (termData instanceof TermRisingInternational) {
-                ((TermRisingInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
-                ((TermRisingInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
-                ((TermRisingInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
-                ((TermRisingInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
-                ((TermRisingInternational) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
+//                ((TermRisingInternational) termData).setCountryCode(row.get("country_code").isNull() ? null : row.get("country_code").getStringValue());
+//                ((TermRisingInternational) termData).setCountryName(row.get("country_name").isNull() ? null : row.get("country_name").getStringValue());
+//                ((TermRisingInternational) termData).setRegionCode(row.get("region_code").isNull() ? null : row.get("region_code").getStringValue());
+//                ((TermRisingInternational) termData).setRegionName(row.get("region_name").isNull() ? null : row.get("region_name").getStringValue());
+//                ((TermRisingInternational) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
             }
 
             if (termData instanceof TermUSA) {
-                ((TermUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
-                ((TermUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
+//                ((TermUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
+//                ((TermUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
             }
 
             if (termData instanceof TermRisingUSA) {
-                ((TermRisingUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
-                ((TermRisingUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
-                ((TermRisingUSA) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
+//                ((TermRisingUSA) termData).setDmaId(row.get("dma_id").isNull() ? null : row.get("dma_id").getNumericValue().intValue());
+//                ((TermRisingUSA) termData).setDmaName(row.get("dma_name").isNull() ? null : row.get("dma_name").getStringValue());
+//                ((TermRisingUSA) termData).setPercentGain(row.get("percent_gain").isNull() ? null : row.get("percent_gain").getNumericValue().intValue());
             }
 
             terms.add(termData);
@@ -180,4 +188,13 @@ public class BigQueryService {
         };
     }
 
+    public GoogleTrendsResponseDTO getTopTermUSA() {
+        DataFilterDTO filterDTO = new DataFilterDTO();
+
+        filterDTO.setStartDate("2023-11-04");
+        filterDTO.setEndDate("2023-11-14");
+
+        return filterGoogleTrendsData(25, filterDTO);
+
+    }
 }

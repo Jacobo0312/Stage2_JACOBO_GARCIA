@@ -6,7 +6,7 @@ export default function PricingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-5 ">
+    <section className="flex flex-col items-center justify-center gap-4 py-5">
       <Navbar />
       {children}
     </section>
