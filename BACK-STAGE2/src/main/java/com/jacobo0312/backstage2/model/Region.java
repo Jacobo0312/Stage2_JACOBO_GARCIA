@@ -1,17 +1,17 @@
 package com.jacobo0312.backstage2.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermRisingInternational extends TermInternational {
+@Builder
+public class Region {
 
-    private Integer percentGain;
+    private String name;
+    private String code;
 
 }

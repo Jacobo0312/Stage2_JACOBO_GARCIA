@@ -1,9 +1,6 @@
 package com.jacobo0312.backstage2.dto;
 
-import com.jacobo0312.backstage2.model.TermInternational;
-import com.jacobo0312.backstage2.model.TermRisingInternational;
-import com.jacobo0312.backstage2.model.TermRisingUSA;
-import com.jacobo0312.backstage2.model.TermUSA;
+import com.jacobo0312.backstage2.model.Term;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -22,19 +19,19 @@ public class GoogleTrendsResponseDTO {
 
     @ApiModelProperty(notes = "List of international terms")
     @Builder.Default
-    private List<TermInternational> termInternationalList = new ArrayList<>();
+    private List<Term> termInternationalList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of rising international terms")
     @Builder.Default
-    private List<TermRisingInternational> termRisingInternationalList = new ArrayList<>();
+    private List<Term> termRisingInternationalList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of USA terms")
     @Builder.Default
-    private List<TermUSA> termUSAList = new ArrayList<>();
+    private List<Term> termUSAList = new ArrayList<>();
 
     @ApiModelProperty(notes = "List of rising USA terms")
     @Builder.Default
-    private List<TermRisingUSA> termRisingUSAList = new ArrayList<>();
+    private List<Term> termRisingUSAList = new ArrayList<>();
 
 
 }

@@ -1,4 +1,5 @@
 'use client';
+
 import HorizontalBarChart from '@/components/horizontalBarChart';
 import { GoogleTrendsResponseDTO } from '@/interfaces/GoogleTrendsResponseDTO';
 import React from 'react';
@@ -6,9 +7,10 @@ import { subtitle } from '@/components/primitives';
 
 async function getTopTermUsa() {
   const response = await fetch(
-    'http://localhost:8000/api/google-trends/top_term_usa',
+    'http://localhost:8000/api/google-trends/top_terms_global',
   );
   const data = await response.json();
+  console.log('data', data);
   return data;
 }
 
@@ -26,7 +28,7 @@ const Page = () => {
   return (
     <>
       <h1 className={subtitle({})} style={{ textAlign: 'center' }}>
-        TOP 25 TRENDING GOOGLE SEARCH TERMS (Refreshed Daily, as of 12AM EST)
+        TOP 25 TRENDING GOOGLE SEARCH TERMS IN LAST WEEK
       </h1>
       <div className="grid grid-cols-2 gap-4 p-2">
         <HorizontalBarChart

@@ -1,16 +1,19 @@
 package com.jacobo0312.backstage2.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermRisingUSA extends TermUSA{
+@Builder
+public class Country {
 
-    private Integer percentGain;
-    
+    private String name;
+    private String code;
+
 }

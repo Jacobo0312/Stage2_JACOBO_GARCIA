@@ -1,8 +1,8 @@
 package com.jacobo0312.backstage2.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -12,17 +12,20 @@ import java.util.List;
 public class DataFilterDTO {
 
     @ApiModelProperty(notes = "Term to search")
-    @Size(max = 2, message = "Term should not exceed 255 characters")
+    @Size(max = 255, message = "Term should not exceed 255 characters")
     private String term;
 
     private List<@Size(max = 255, message = "Country should not exceed 255 characters") String> countries;
+
+    private List<@Size(max = 255, message = "Region should not exceed 255 characters") String> regions;
+
+    private List<@Size(max = 255, message = "DMA should not exceed 255 characters") String> dmaList;
 
     @ApiModelProperty(notes = "Start date for the time range filter (format: yyyy-MM-dd)")
     private String startDate;
 
     @ApiModelProperty(notes = "End date for the time range filter (format: yyyy-MM-dd)")
     private String endDate;
-
 
 }
 

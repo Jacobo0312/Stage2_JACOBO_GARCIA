@@ -43,15 +43,10 @@ export default function RootLayout({
           <div className="relative flex flex-col h-screen ">
             <main className=" mx-auto px-6 flex-grow">{children}</main>
             <footer className="w-full flex items-center justify-center py-3">
-              <Link
-                isExternal
-                className="flex items-center gap-1 text-current"
-                title="nextui.org homepage"
-              >
-                <span className="text-default-600">Powered by</span>
-                <Link href="https://github.com/Jacobo0312" isExternal>
-                  Jacobo0312
-                </Link>
+              <span className="text-default-600">Powered by</span>
+              <div>&nbsp;</div>{' '}
+              <Link href="https://github.com/Jacobo0312" isExternal>
+                Jacobo0312
               </Link>
             </footer>
           </div>
