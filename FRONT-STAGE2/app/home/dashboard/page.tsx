@@ -5,7 +5,7 @@ import { GoogleTrendsResponseDTO } from '@/interfaces/GoogleTrendsResponseDTO';
 import React from 'react';
 import { subtitle } from '@/components/primitives';
 
-async function getTopTermUsa() {
+async function getTopTermGlobal() {
   const response = await fetch(
     'http://localhost:8000/api/google-trends/top_terms_global',
   );
@@ -19,7 +19,7 @@ const Page = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    getTopTermUsa().then((data) => {
+    getTopTermGlobal().then((data) => {
       setData(data);
       setLoading(false);
     });

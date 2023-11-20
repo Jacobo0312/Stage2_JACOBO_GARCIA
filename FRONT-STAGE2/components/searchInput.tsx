@@ -1,7 +1,11 @@
 import { Input } from '@nextui-org/react';
 import { SearchIcon } from '@/components/icons';
 
-const SearchInput = () => {
+type Props = {
+  term: string;
+  setTerm: (value: string) => void;
+};
+const SearchInput = ({ term, setTerm }: Props) => {
   return (
     <Input
       aria-label="Search"
@@ -15,6 +19,8 @@ const SearchInput = () => {
         <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
       }
       type="search"
+      value={term}
+      onChange={(e) => setTerm(e.target.value)}
     />
   );
 };

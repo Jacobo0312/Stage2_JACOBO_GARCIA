@@ -1,20 +1,21 @@
 'use client';
-import SearchInput from '@/components/searchInput';
-import SelectCountries from '@/components/selectCountries';
 import { Country } from '@/interfaces/Country';
-import { Button, Select, SelectItem } from '@nextui-org/react';
 import React from 'react';
-import { PlayIcon } from '@/components/icons';
-import SelectRegions from '@/components/selectRegions';
 import { DMA } from '@/interfaces/DMA';
-import DatePickerWithRange from '@/components/dateRangePicker';
+import FilterBar from '@/components/filterBar';
+import DataFilterDTO from '@/interfaces/DataFilterDTO';
+import { addDays, set } from 'date-fns';
+import { DateRange } from 'react-day-picker';
+import { formatDateToYYYYMMDD } from '@/utils/formatDate';
+import HorizontalBarChart from '@/components/horizontalBarChart';
+import { GoogleTrendsResponseDTO } from '@/interfaces/GoogleTrendsResponseDTO';
+import Loader from '@/components/loader';
 
 async function getCountries() {
   const response = await fetch(
     'http://localhost:8000/api/google-trends/countries',
   );
   const data: Country[] = await response.json();
-  console.log('data', data);
   return data;
 }
 
@@ -32,37 +33,22 @@ async function getDMAList(): Promise<DMA[]> {
   return data;
 }
 
-const limits = [
-  {
-    label: '10',
-    value: 10,
-  },
-  {
-    label: '15',
-    value: 15,
-  },
-  {
-    label: '20',
-    value: 20,
-  },
-  {
-    label: '25',
-    value: 25,
-  },
-  {
-    label: '30',
-    value: 30,
-  },
-];
-
 const Page = () => {
+  //States
   const [countries, setCountries] = React.useState<Country[]>([]);
   const [regions, setRegions] = React.useState<any[]>([]);
   const [dmaList, setDMAList] = React.useState<DMA[]>([]);
   const [valuesCountries, setValuesCountries] = React.useState([]);
   const [valuesRegions, setValuesRegions] = React.useState([]);
   const [valuesDma, setValuesDma] = React.useState([]);
-
+  const [term, setTerm] = React.useState<string>('');
+  const [limit, setLimit] = React.useState<any>();
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(2022, 0, 20),
+    to: addDays(new Date(2022, 0, 20), 20),
+  });
+  const [data, setData] = React.useState<any>();
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     getCountries().then((data) => {
       setCountries(data);
@@ -84,62 +70,101 @@ const Page = () => {
       });
     } else {
       setRegions([]);
+      setValuesRegions([]);
     }
   }, [valuesCountries]);
 
   const runQuery = async () => {
-    console.log(Array.from(valuesCountries));
+    const data: DataFilterDTO = {
+      term: term,
+      countries: Array.from(valuesCountries),
+      regions: Array.from(valuesRegions),
+      dmaList: Array.from(valuesDma),
+    };
+
+    if (date && date.from && date.to) {
+      data.startDate = formatDateToYYYYMMDD(date.from);
+      data.endDate = formatDateToYYYYMMDD(date.to);
+    }
+
+    const limitValue = limit?.target.value;
+
+    const limitParam = limitValue ? `limit=${limitValue}` : '';
+
+    setLoading(true);
+
+    const response = await fetch(
+      `http://localhost:8000/api/google-trends/create?${limitParam}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      },
+    );
+    const result = (await response.json()) as GoogleTrendsResponseDTO;
+    setData(result);
+    setLoading(false);
   };
 
   return (
-    <div className="flex w-full space-x-5 justify-between items-center py-2">
-      <SearchInput />
-      <SelectCountries
+    <div className="flex-col w-full ">
+      <FilterBar
+        term={term}
+        setTerm={setTerm}
         countries={countries}
-        setValues={setValuesCountries}
-        values={valuesCountries}
+        setValuesCountries={setValuesCountries}
+        valuesCountries={valuesCountries}
+        regions={regions}
+        setValuesRegions={setValuesRegions}
+        valuesRegions={valuesRegions}
+        dmaList={dmaList}
+        setValuesDma={setValuesDma}
+        valuesDma={valuesDma}
+        date={date}
+        setDate={setDate}
+        limit={limit}
+        setLimit={setLimit}
+        run={runQuery}
       />
-      {/* Select regions */}
-      {regions.length > 0 && (
-        <SelectRegions
-          regions={regions}
-          values={valuesRegions}
-          setValues={setValuesRegions}
-        />
+      {data && (
+        <div className="grid grid-cols-2 gap-4 p-2">
+          {data.termUSAList.length > 0 && (
+            <HorizontalBarChart
+              titleText="Top 25 Term USA"
+              chartData={data.termUSAList}
+              loading={loading}
+            />
+          )}
+          {data.termInternationalList.length > 0 && (
+            <HorizontalBarChart
+              titleText="Top Term 25 International"
+              chartData={data.termInternationalList}
+              loading={loading}
+            />
+          )}
+          {data.termRisingUSAList.length > 0 && (
+            <HorizontalBarChart
+              titleText="Top Term 25 Rising USA"
+              chartData={data.termRisingUSAList}
+              loading={loading}
+            />
+          )}
+          {data.termRisingInternationalList.length > 0 && (
+            <HorizontalBarChart
+              titleText="Top Term 25 Rising International"
+              chartData={data.termRisingInternationalList}
+              loading={loading}
+            />
+          )}
+        </div>
       )}
-      {/* Limit */}
-      <Select
-        items={limits}
-        label="Limit"
-        placeholder="Select limit"
-        className="max-w-xs"
-      >
-        {(limit) => <SelectItem key={limit.value}>{limit.label}</SelectItem>}
-      </Select>
-      <Select
-        label="DMA'S"
-        placeholder='Select DMA"s'
-        selectionMode="multiple"
-        selectedKeys={valuesDma}
-        onSelectionChange={() => setValuesDma}
-        className="max-w-xs"
-      >
-        {dmaList &&
-          dmaList.map(({ name, id }) => (
-            <SelectItem key={id}>{name}</SelectItem>
-          ))}
-      </Select>
-      {/* Calendar */}
-      <DatePickerWithRange />
-      {/* Run button */}
-      <Button
-        color="success"
-        endContent={<PlayIcon />}
-        className="text-white"
-        onClick={runQuery}
-      >
-        <b>Run</b>
-      </Button>
+      {loading && (
+        <div className="flex justify-center">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 };

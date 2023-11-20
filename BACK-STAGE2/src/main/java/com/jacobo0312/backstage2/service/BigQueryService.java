@@ -31,9 +31,27 @@ public class BigQueryService {
 
         //Filter by countries
         if (filterDTO.getCountries() != null && !filterDTO.getCountries().isEmpty()) {
-            query.append(" AND country_name IN (");
+            query.append(" AND country_code IN (");
             for (String country : filterDTO.getCountries()) {
                 query.append("'").append(country).append("',");
+            }
+            // Delete the last comma
+            query.deleteCharAt(query.length() - 1);
+            query.append(")");
+        }
+
+        // Filter by dma
+        if (filterDTO.getDmaList() != null && !filterDTO.getDmaList().isEmpty()) {
+            query.append(" AND dma_id IN (");
+            for (String dma : filterDTO.getDmaList()) {
+                // Ensure dma is a valid number (assuming it's a string representation of INT64)
+                try {
+                    Long dmaNumber = Long.parseLong(dma);
+                    query.append(dmaNumber).append(",");
+                } catch (NumberFormatException e) {
+                    // Handle the case where dma is not a valid number
+                    // You can log an error, skip the invalid value, or handle it as needed
+                }
             }
             // Delete the last comma
             query.deleteCharAt(query.length() - 1);
@@ -56,7 +74,7 @@ public class BigQueryService {
 
 
         // Add the order by score
-        query.append("GROUP BY\n" +
+        query.append(" GROUP BY\n" +
                 "  term, rank\n" +
                 "ORDER BY\n" +
                 "  rank ASC,score DESC");
@@ -210,7 +228,7 @@ public class BigQueryService {
         return regions;
     }
 
-    public List<DMA> getDmaList(){
+    public List<DMA> getDmaList() {
         String query = "SELECT DISTINCT dma_name,dma_id FROM bigquery-public-data.google_trends.top_terms ORDER BY dma_name ASC";
         TableResult result;
         try {

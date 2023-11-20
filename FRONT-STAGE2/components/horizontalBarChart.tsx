@@ -1,7 +1,6 @@
 import dynamic from 'next/dynamic';
 import { title } from './primitives';
 import { Card, CardHeader, Skeleton } from '@nextui-org/react';
-import { toCapitalCase } from '@/utils/toCapitalCase';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -10,7 +9,7 @@ type Props = { titleText: string; chartData: CharData[]; loading: boolean };
 
 const HorizontalBarChart = ({ titleText, chartData, loading }: Props) => {
   const chartLabels = chartData.map(
-    (i: CharData, index: number) => index + 1 + ' - ' + toCapitalCase(i.term),
+    (i: CharData, index: number) => index + 1 + ' - ' + i.term,
   );
 
   const chartOptions: ApexCharts.ApexOptions = {
