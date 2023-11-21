@@ -70,7 +70,7 @@ Add a comment.
 
 By clicking on "GO," you can edit that query.
 
-![Go Query](docs/images/goQuery.png)
+![Go Query](docs/images/topMiami.png)
 
 Finally, you can log out here.
 
