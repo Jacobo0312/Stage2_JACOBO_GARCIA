@@ -12,23 +12,21 @@ import { GoogleTrendsResponseDTO } from '@/interfaces/GoogleTrendsResponseDTO';
 import Loader from '@/components/loader';
 
 async function getCountries() {
-  const response = await fetch(
-    'http://localhost:8000/api/google-trends/countries',
-  );
+  const response = await fetch(`${process.env.API_URL}google-trends/countries`);
   const data: Country[] = await response.json();
   return data;
 }
 
 async function getRegions(countryCode: string) {
   const response = await fetch(
-    `http://localhost:8000/api/google-trends/regions/${countryCode}`,
+    `${process.env.API_URL}google-trends/regions/${countryCode}`,
   );
   const data = await response.json();
   return data;
 }
 
 async function getDMAList(): Promise<DMA[]> {
-  const response = await fetch('http://localhost:8000/api/google-trends/dma');
+  const response = await fetch(`${process.env.API_URL}google-trends/dma`);
   const data = await response.json();
   return data;
 }
@@ -93,8 +91,10 @@ const Page = () => {
 
     setLoading(true);
 
+    console.log(data);
+
     const response = await fetch(
-      `http://localhost:8000/api/google-trends/create?${limitParam}`,
+      `${process.env.API_URL}google-trends/create?${limitParam}`,
       {
         method: 'POST',
         headers: {

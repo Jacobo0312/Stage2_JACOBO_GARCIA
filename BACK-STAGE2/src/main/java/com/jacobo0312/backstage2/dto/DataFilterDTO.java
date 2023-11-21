@@ -3,6 +3,8 @@ package com.jacobo0312.backstage2.dto;
 import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.List;
 
 @Data

@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -73,11 +75,8 @@ public class BigQueryService {
         }
 
 
-        // Add the order by score
-        query.append(" GROUP BY\n" +
-                "  term, rank\n" +
-                "ORDER BY\n" +
-                "  rank ASC,score DESC");
+        // Add the order by score and group by term
+        query.append(" GROUP BY term, rank ORDER BY rank ASC,score DESC");
 
         //Add the limit
         query.append(" LIMIT ").append(limit);
@@ -169,8 +168,18 @@ public class BigQueryService {
     public GoogleTrendsResponseDTO getTopTerm() {
         DataFilterDTO filterDTO = DataFilterDTO.builder().build();
 
-        filterDTO.setStartDate("2023-11-04");
-        filterDTO.setEndDate("2023-11-14");
+        // Get the current date from the server
+        LocalDate currentDate = LocalDate.now();
+
+        // Calculate the start date by going back two weeks from the current date
+        LocalDate startDate = currentDate.minusWeeks(2);
+
+        // Format the dates in the "yyyy-MM-dd" format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        filterDTO.setStartDate(startDate.format(formatter));
+        filterDTO.setEndDate(currentDate.format(formatter));
+
+        log.info("service gctj filterDTO: " + filterDTO);
 
         return filterGoogleTrendsData(25, filterDTO);
 

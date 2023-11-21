@@ -7,10 +7,9 @@ import { subtitle } from '@/components/primitives';
 
 async function getTopTermGlobal() {
   const response = await fetch(
-    'http://localhost:8000/api/google-trends/top_terms_global',
+    `${process.env.API_URL}google-trends/top_terms_global`,
   );
   const data = await response.json();
-  console.log('data', data);
   return data;
 }
 

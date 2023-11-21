@@ -1,19 +1,6 @@
 'use client';
 
-import {
-  Kbd,
-  Input,
-  Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-  Tabs,
-  Tab,
-  Avatar,
-} from '@nextui-org/react';
+import { Tabs, Tab, Avatar } from '@nextui-org/react';
 import {
   Dropdown,
   DropdownTrigger,
@@ -28,6 +15,8 @@ import { siteConfig } from '@/config/site';
 import NextLink from 'next/link';
 
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+
 import React from 'react';
 import Loader from './loader';
 import Image from 'next/image';
@@ -35,9 +24,9 @@ import Image from 'next/image';
 export const Navbar = () => {
   //Router
   const router = useRouter();
+  const pathname = usePathname();
   const [username, setUsername] = React.useState('');
   const [loading, setLoading] = React.useState(false);
-
   React.useEffect(() => {
     setLoading(true);
     const username = localStorage.getItem('username');
@@ -63,7 +52,13 @@ export const Navbar = () => {
       <Image src={GoogleTrendsLogo} alt="Google Trends Logo" width={200} />
 
       {/* TABS */}
-      <Tabs aria-label="Options" color="primary" variant="bordered" size="lg">
+      <Tabs
+        aria-label="Options"
+        color="primary"
+        variant="bordered"
+        size="lg"
+        selectedKey={pathname}
+      >
         {siteConfig.navItems.map((item) => (
           <Tab
             key={item.href}
