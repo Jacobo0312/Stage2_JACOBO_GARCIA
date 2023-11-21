@@ -16,6 +16,7 @@ public class QueryResponseDTO {
     private String id;
     private String queryName;
     private String username;
+    private String description;
     private List<CommentResponseDTO> comments;
     private DataFilterDTO dataFilter;
 }

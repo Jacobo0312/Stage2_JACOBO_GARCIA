@@ -24,6 +24,8 @@ public class Query {
 
     private String username;
 
+    private String description;
+
     @OneToMany(mappedBy = "query")
     private List<Comment> comments;
 

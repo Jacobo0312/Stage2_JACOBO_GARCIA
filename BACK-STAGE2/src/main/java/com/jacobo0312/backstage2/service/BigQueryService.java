@@ -27,7 +27,7 @@ public class BigQueryService {
     private static final String TOP_RISING_TERMS_TABLE = "bigquery-public-data.google_trends.top_rising_terms";
 
 
-    public GoogleTrendsResponseDTO filterGoogleTrendsData(int limit, DataFilterDTO filterDTO) {
+    public GoogleTrendsResponseDTO filterGoogleTrendsData(DataFilterDTO filterDTO) {
 
         StringBuilder query = new StringBuilder("SELECT term, rank, AVG(score) AS score FROM `table` WHERE 1=1");
 
@@ -79,7 +79,7 @@ public class BigQueryService {
         query.append(" GROUP BY term, rank ORDER BY rank ASC,score DESC");
 
         //Add the limit
-        query.append(" LIMIT ").append(limit);
+        query.append(" LIMIT ").append(filterDTO.getLimit());
 
         GoogleTrendsResponseDTO responseDTO = GoogleTrendsResponseDTO.builder().build();
 
@@ -168,6 +168,9 @@ public class BigQueryService {
     public GoogleTrendsResponseDTO getTopTerm() {
         DataFilterDTO filterDTO = DataFilterDTO.builder().build();
 
+        //Set the limit to 25
+        filterDTO.setLimit(25);
+
         // Get the current date from the server
         LocalDate currentDate = LocalDate.now();
 
@@ -181,7 +184,7 @@ public class BigQueryService {
 
         log.info("service gctj filterDTO: " + filterDTO);
 
-        return filterGoogleTrendsData(25, filterDTO);
+        return filterGoogleTrendsData(filterDTO);
 
     }
 

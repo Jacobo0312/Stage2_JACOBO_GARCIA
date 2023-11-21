@@ -7,6 +7,7 @@ import DatePickerWithRange from './dateRangePicker';
 import { PlayIcon } from './icons';
 import { DateRange } from 'react-day-picker';
 import { setDate } from 'date-fns';
+import { SaveIcon } from 'lucide-react';
 
 const limits = [
   {
@@ -47,6 +48,7 @@ type Props = {
   setDate: (date: DateRange | undefined) => void;
   limit: string;
   setLimit: (value: any) => void;
+  save: () => void;
   run: () => void;
 };
 
@@ -67,64 +69,78 @@ const FilterBar = ({
   limit,
   setLimit,
   run,
+  save,
 }: Props) => {
   return (
-    <div className="flex w-full space-x-5 justify-between items-center py-2">
-      {' '}
-      <SearchInput term={term} setTerm={setTerm} />
-      {Array.from(valuesDma).length === 0 && (
-        <SelectCountries
-          countries={countries}
-          setValues={setValuesCountries}
-          values={valuesCountries}
-        />
-      )}
-      {/* Select regions */}
-      {regions.length > 0 && Array.from(valuesCountries).length > 0 && (
-        <SelectRegions
-          regions={regions}
-          values={valuesRegions}
-          setValues={setValuesRegions}
-        />
-      )}
-      {Array.from(valuesCountries).length === 0 && (
+    <>
+      <div className="flex w-full space-x-5 justify-between items-center py-2">
+        {' '}
+        <SearchInput term={term} setTerm={setTerm} />
+        {Array.from(valuesDma).length === 0 && (
+          <SelectCountries
+            countries={countries}
+            setValues={setValuesCountries}
+            values={valuesCountries}
+          />
+        )}
+        {/* Select regions */}
+        {regions.length > 0 && Array.from(valuesCountries).length > 0 && (
+          <SelectRegions
+            regions={regions}
+            values={valuesRegions}
+            setValues={setValuesRegions}
+          />
+        )}
+        {Array.from(valuesCountries).length === 0 && (
+          <Select
+            label="DMA'S"
+            placeholder="Select DMA's"
+            selectionMode="multiple"
+            selectedKeys={valuesDma}
+            onSelectionChange={setValuesDma}
+            className="max-w-xs"
+          >
+            {dmaList &&
+              dmaList.map(({ name, id }) => (
+                <SelectItem key={id}>{name}</SelectItem>
+              ))}
+          </Select>
+        )}
+        {/* Limit */}
         <Select
-          label="DMA'S"
-          placeholder='Select DMA"s'
-          selectionMode="multiple"
-          selectedKeys={valuesDma}
-          onSelectionChange={setValuesDma}
-          className="max-w-xs"
+          items={limits}
+          label="Limit"
+          placeholder="Select limit"
+          value={limit}
+          onChange={setLimit}
+          // className="max-w-10"
         >
-          {dmaList &&
-            dmaList.map(({ name, id }) => (
-              <SelectItem key={id}>{name}</SelectItem>
-            ))}
+          {(limit) => <SelectItem key={limit.value}>{limit.label}</SelectItem>}
         </Select>
-      )}
-      {/* Limit */}
-      <Select
-        items={limits}
-        label="Limit"
-        placeholder="Select limit"
-        value={limit}
-        onChange={setLimit}
-        // className="max-w-10"
-      >
-        {(limit) => <SelectItem key={limit.value}>{limit.label}</SelectItem>}
-      </Select>
-      {/* Calendar */}
-      <DatePickerWithRange date={date} setDate={setDate} />
-      {/* Run button */}
-      <Button
-        color="success"
-        endContent={<PlayIcon />}
-        className="text-white"
-        onClick={run}
-      >
-        <b>Run</b>
-      </Button>
-    </div>
+        {/* Calendar */}
+        <DatePickerWithRange date={date} setDate={setDate} />
+      </div>
+      <div className="flex items-center justify-center space-x-3 py-5">
+        {/* Run button */}
+        <Button
+          color="success"
+          endContent={<PlayIcon />}
+          className="text-white"
+          onClick={run}
+        >
+          <b>Run</b>
+        </Button>
+        {/* Save button */}
+        <Button
+          color="warning"
+          endContent={<SaveIcon />}
+          className="text-white"
+          onClick={save}
+        >
+          <b>Save</b>
+        </Button>
+      </div>
+    </>
   );
 };
 

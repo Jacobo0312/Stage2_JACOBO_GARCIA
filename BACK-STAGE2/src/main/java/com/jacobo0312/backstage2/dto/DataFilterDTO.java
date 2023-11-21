@@ -29,5 +29,9 @@ public class DataFilterDTO {
     @ApiModelProperty(notes = "End date for the time range filter (format: yyyy-MM-dd)")
     private String endDate;
 
+    @ApiModelProperty(notes = "Limit for the number of results")
+    @Builder.Default
+    private int limit = 12;
+
 }
 

@@ -28,6 +28,12 @@ public class QueryRequestDTO {
     @NotBlank
     private String username;
 
+    @ApiModelProperty(notes = "Description")
+    @NotEmpty
+    @NotNull
+    @NotBlank
+    private String description;
+
 
 
     @ApiModelProperty(notes = "Data filter")

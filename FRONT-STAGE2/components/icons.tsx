@@ -216,8 +216,8 @@ export const NextUILogo: React.FC<IconSvgProps> = (props) => {
 export const PlayIcon = () => (
   <svg
     fill="#FFFFFF"
-    height="25px"
-    width="25px"
+    height="20px"
+    width="20px"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 58.752 58.752"
   >
@@ -231,5 +231,34 @@ export const PlayIcon = () => (
 		C49.663,29.47,49.611,29.561,49.524,29.612z"
       />
     </g>
+  </svg>
+);
+
+export const SaveIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="100px"
+    height="100px"
+    viewBox="0 0 100 100"
+  >
+    <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z" />
+  </svg>
+);
+
+export const SendIcon = () => (
+  <svg
+    width="25"
+    height="25"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill="none"
+      stroke="#ffffff"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M9.912 12H4L2.023 4.135A.662.662 0 0 1 2 3.995c-.022-.721.772-1.221 1.46-.891L22 12L3.46 20.896c-.68.327-1.464-.159-1.46-.867a.66.66 0 0 1 .033-.186L3.5 15"
+    />
   </svg>
 );
