@@ -1,5 +1,8 @@
 # User Guide for Google Trends Query Builder
 
+
+## [VIDEO HERE](https://youtu.be/rcOHopNt6Yo)
+
 In this user guide, you will learn how to use the Google Trends Query Builder, a tool for creating queries in Google's database for the most searched terms.
 
 ### Login

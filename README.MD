@@ -61,4 +61,10 @@ The dataset has 4 tables:
 
 > **_NOTE:_**  DMA stands for "Designated Market Area." It's a term commonly used in the United States to define specific geographic regions that television and media markets cover.
 
+## OPEN API AND SWAGGER
 
+![main](docs/swagger/main.png) 
+
+![controllers](docs/swagger/controllers.png) 
+
+![schemas](docs/swagger/schemas.png)
