@@ -78,13 +78,25 @@ public class BigQueryService {
         // Add the order by score and group by term
         query.append(" GROUP BY term, rank ORDER BY rank ASC,score DESC");
 
+        if (filterDTO.getLimitData() == 0) {
+            filterDTO.setLimitData(10);
+        }
         //Add the limit
-        query.append(" LIMIT ").append(filterDTO.getLimit());
+        query.append(" LIMIT ").append(filterDTO.getLimitData());
 
         GoogleTrendsResponseDTO responseDTO = GoogleTrendsResponseDTO.builder().build();
 
 
         for (TableName tableName : TableName.values()) {
+
+            //Skip the table if the filter is not valid
+
+            if ((tableName == TableName.TOP_RISING_TERMS || tableName == TableName.TOP_TERMS) &&
+                    (filterDTO.getCountries() != null && !filterDTO.getCountries().isEmpty())) continue;
+
+            if ((tableName == TableName.INTERNATIONAL_TOP_RISING_TERMS || tableName == TableName.INTERNATIONAL_TOP_TERMS) &&
+                    (filterDTO.getDmaList() != null && !filterDTO.getDmaList().isEmpty())) continue;
+
 
             //Replace table in query
             query.replace(44, query.indexOf(" WHERE"), getTableName(tableName));
@@ -169,7 +181,7 @@ public class BigQueryService {
         DataFilterDTO filterDTO = DataFilterDTO.builder().build();
 
         //Set the limit to 25
-        filterDTO.setLimit(25);
+        filterDTO.setLimitData(25);
 
         // Get the current date from the server
         LocalDate currentDate = LocalDate.now();

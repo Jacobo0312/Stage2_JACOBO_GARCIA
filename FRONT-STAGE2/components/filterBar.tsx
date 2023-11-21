@@ -84,7 +84,7 @@ const FilterBar = ({
           />
         )}
         {/* Select regions */}
-        {regions.length > 0 && Array.from(valuesCountries).length > 0 && (
+        {regions.length > 0 && Array.from(valuesCountries).length === 1 && (
           <SelectRegions
             regions={regions}
             values={valuesRegions}
@@ -112,7 +112,8 @@ const FilterBar = ({
           label="Limit"
           placeholder="Select limit"
           value={limit}
-          onChange={setLimit}
+          selectedKeys={limit ? [limit] : []}
+          onChange={(e) => setLimit(e.target.value)}
           // className="max-w-10"
         >
           {(limit) => <SelectItem key={limit.value}>{limit.label}</SelectItem>}

@@ -37,7 +37,7 @@ export default function QueriesList({ queries, mutate }: Props) {
 
   const handleGoToQuery = (dataFilter: DataFilterDTO) => {
     if (!dataFilter) return;
-    const { countries, dmaList, endDate, limit, regions, startDate, term } =
+    const { countries, dmaList, endDate, limitData, regions, startDate, term } =
       dataFilter;
     //Add to query params
     const params = new URLSearchParams();
@@ -54,8 +54,8 @@ export default function QueriesList({ queries, mutate }: Props) {
       params.append('endDate', endDate);
     }
 
-    if (limit && limit > 0) {
-      params.append('limit', limit.toString());
+    if (limitData && limitData > 0) {
+      params.append('limit', limitData.toString());
     }
 
     if (regions && regions.length > 0) {

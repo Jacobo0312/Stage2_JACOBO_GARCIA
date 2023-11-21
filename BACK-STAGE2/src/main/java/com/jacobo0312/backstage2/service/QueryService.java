@@ -24,8 +24,14 @@ public class QueryService {
     private final QueryMapper queryMapper;
 
     public QueryResponseDTO createQuery(QueryRequestDTO queryRequestDTO) {
+        log.info("Creating query: {}", queryRequestDTO);
         Query query = queryMapper.toQuery(queryRequestDTO);
         query.setComments(new ArrayList<>());
+        if (queryRequestDTO.getDataFilter().getLimitData() ==0 ) {
+            query.getDataFilter().setLimitData(10);
+        }else {
+            query.getDataFilter().setLimitData(queryRequestDTO.getDataFilter().getLimitData());
+        }
         Query savedQuery = queryRepository.save(query);
         return queryMapper.toQueryResponseDTO(savedQuery);
     }

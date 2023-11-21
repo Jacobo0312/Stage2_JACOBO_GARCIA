@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.UUID;
 import java.util.List;
 
@@ -32,5 +33,7 @@ public class DataFilter {
 
     private String startDate;
     private String endDate;
+    private int limitData;
+
 
 }

@@ -31,7 +31,7 @@ public class DataFilterDTO {
 
     @ApiModelProperty(notes = "Limit for the number of results")
     @Builder.Default
-    private int limit = 12;
+    private int limitData = 10;
 
 }
 

@@ -5,7 +5,7 @@ interface DataFilterDTO {
   dmaList?: string[];
   startDate?: string;
   endDate?: string;
-  limit?: number;
+  limitData?: number;
 }
 
 export default DataFilterDTO;

@@ -6,7 +6,7 @@ import FilterBar from '@/components/filterBar';
 import DataFilterDTO from '@/interfaces/DataFilterDTO';
 import { addDays, set } from 'date-fns';
 import { DateRange } from 'react-day-picker';
-import { formatDateToYYYYMMDD } from '@/utils/formatDate';
+import { formatDateToYYYYMMDD, parseDateString } from '@/utils/formatDate';
 import HorizontalBarChart from '@/components/horizontalBarChart';
 import Loader from '@/components/loader';
 import useQuery from '@/hooks/useQuery';
@@ -36,6 +36,7 @@ async function getDMAList(): Promise<DMA[]> {
 }
 
 const Page = () => {
+  const searchParams = useSearchParams();
   //States
   const [countries, setCountries] = React.useState<Country[]>([]);
   const [regions, setRegions] = React.useState<any[]>([]);
@@ -44,15 +45,16 @@ const Page = () => {
   const [valuesRegions, setValuesRegions] = React.useState([]);
   const [valuesDma, setValuesDma] = React.useState([]);
   const [term, setTerm] = React.useState<string>('');
-  const [limit, setLimit] = React.useState<any>();
+  const [limit, setLimit] = React.useState<string>(
+    searchParams.get('limit') || '',
+  );
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
+    from: new Date(2023, 0, 20),
+    to: addDays(new Date(2023, 0, 20), 20),
   });
   const [query, setQuery] = React.useState<QueryRequestDTO>();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const searchParams = useSearchParams();
 
   //Hooks
   const { data, loading, runQuery } = useQuery();
@@ -77,6 +79,17 @@ const Page = () => {
         }
       }
     });
+
+    //Set date range by query params
+    if (searchParams.has('startDate') && searchParams.has('endDate')) {
+      const startDate = searchParams.get('startDate') || '';
+      const endDate = searchParams.get('endDate') || '';
+      const dateRange: DateRange = {
+        from: parseDateString(startDate),
+        to: parseDateString(endDate),
+      };
+      setDate(dateRange);
+    }
   }, [searchParams]);
 
   React.useEffect(() => {
@@ -107,7 +120,7 @@ const Page = () => {
       countries: Array.from(valuesCountries),
       regions: Array.from(valuesRegions),
       dmaList: Array.from(valuesDma),
-      limit: limit?.target.value,
+      limitData: parseInt(limit),
     };
 
     if (date && date.from && date.to) {
@@ -123,7 +136,7 @@ const Page = () => {
       countries: Array.from(valuesCountries),
       regions: Array.from(valuesRegions),
       dmaList: Array.from(valuesDma),
-      limit: limit?.target.value,
+      limitData: parseInt(limit),
     };
 
     if (date && date.from && date.to) {
